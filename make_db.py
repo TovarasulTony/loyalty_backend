@@ -1,10 +1,11 @@
+import os
 import configparser
 import randomname
 import names
 import random, string
 from flask_api import app, db
 from flask_api.models import User, Manager, Brand
-from flask_test.random_generator import get_random_user, get_random_wallet
+#from flask_test.random_generator import get_random_user, get_random_wallet
 
 '''
 # importing datetime module
@@ -33,12 +34,20 @@ print(user)
 get_random_wallet()
 
 '''
+
 class DbGenerator():
     config = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
     brand_list = []
 
     def __init__(self):
         self.config.read('config/models.ini')
+
+        delete_command = "rm /root/tony/loyalty_backend/site.db"
+        os.system(delete_command)
+
+        app.app_context().push()
+        db.create_all()
+
 
     def generate_user(self):
         return User(
