@@ -7,8 +7,8 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
     #[Fields]
-    nickname = db.Column(db.String(config["user"]["nickname_length"]), nullable=False)
-    wallet_address = db.Column(db.String(config["user"]["wallet_address_length"]), nullable=False)
+    nickname = db.Column(db.String(int(config["user"]["nickname_length"])), nullable=False)
+    wallet_address = db.Column(db.String(int(config["user"]["wallet_address_length"])), nullable=False)
 
     #[Relationships]
     cashier = db.relationship('Cashier', backref='user', lazy=True)
@@ -95,9 +95,9 @@ class Brand(db.Model):
     manager_id = db.Column(db.Integer, db.ForeignKey('manager.id'), nullable=False)
 
     #[Fields]
-    name = db.Column(db.String(config["brand"]["name_length"]), nullable=False)
+    name = db.Column(db.String(int(config["brand"]["name_length"])), nullable=False)
     type = db.Column(Enum(BRAND_TYPE), nullable=False)
-    program = db.Column(db.String(config["brand"]["program_length"]), nullable=False)
+    program = db.Column(db.String(int(config["brand"]["program_length"])), nullable=False)
     threshold = db.Column(db.Double, nullable=False)
 
     #[Relationships]
@@ -122,8 +122,8 @@ class Shop(db.Model):
     brand_id = db.Column(db.Integer, db.ForeignKey('brand.id'), nullable=False)
 
     #[Fields]
-    location = db.Column(db.String(config["shop"]["location_length"]), nullable=False)
-    wallet_address = db.Column(db.String(config["shop"]["wallet_address_length"]), nullable=False)
+    location = db.Column(db.String(int(config["shop"]["location_length"])), nullable=False)
+    wallet_address = db.Column(db.String(int(config["shop"]["wallet_address_length"])), nullable=False)
     #maybe monthly earned
     
     #[Relationships]

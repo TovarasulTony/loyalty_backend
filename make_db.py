@@ -56,10 +56,10 @@ class DbGenerator():
         )
 
     def generate_manager(self):
-        return Manager(
-            nickname = names.get_full_name(),
-            wallet_address = 'G' + ''.join([random.choice(string.ascii_uppercase  + string.digits) for _ in range(55)])
+        manager = Manager(
+            user = self.generate_user()
         )
+        #print(manager.u)
 
     def generate_brand(self):
 
