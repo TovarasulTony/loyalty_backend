@@ -1,0 +1,23 @@
+#cool practive found at: https://stackoverflow.com/questions/17803829/how-to-customize-a-requirements-txt-for-multiple-environments
+
+### Config
+configparser==7.0.0
+
+### Flask
+Flask==3.0.3
+# Deps
+blinker==1.8.2
+click==8.1.7
+importlib_metadata==7.1.0
+itsdangerous==2.2.0
+Jinja2==3.1.4
+MarkupSafe==2.1.5
+Werkzeug==3.0.3
+zipp==3.18.2
+
+### Flask-SQLAlchemy
+Flask-SQLAlchemy==3.1.1
+# Deps
+greenlet==3.0.3
+SQLAlchemy==2.0.30
+typing_extensions==4.12.0

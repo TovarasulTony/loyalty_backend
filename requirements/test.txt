@@ -1,0 +1,13 @@
+#--- Includes
+-r common.txt
+
+#--- Specifics
+### Random Person Names
+names==0.3.0
+
+### Random Object Names(e.x.: Brands)
+randomname==0.2.1
+# Deps
+fire==0.6.0
+six==1.16.0
+termcolor==2.4.0
