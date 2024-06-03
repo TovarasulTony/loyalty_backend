@@ -11,3 +11,6 @@ randomname==0.2.1
 fire==0.6.0
 six==1.16.0
 termcolor==2.4.0
+
+### Lorem Ipsum
+lorem-text==2.1
