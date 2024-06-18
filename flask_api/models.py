@@ -20,10 +20,11 @@ class Log():
 
     def add_relation(self, field_name, relation_list):
         self.return_string += self.prefix + f'[{field_name}]:\n'
-        print(type(relation_list))
-        #self.return_string += relation_list.log(self.number_of_spaces + 1)
         for object in relation_list:
             self.return_string += object.log(self.number_of_spaces + 1)
+
+    def add_backref(self, field_name, backref):
+        self.return_string += backref.log(self.number_of_spaces + 1)
 
 class Logger():
     def log(self, number_of_spaces = 0):
@@ -104,8 +105,8 @@ class Card(db.Model, Logger):
     def log(self, number_of_spaces=0):
         log = Log("Card" , number_of_spaces)
         log.add_field('ID', self.id)
-        log.add_relation('Holder', self.holder)
-        log.add_relation('Brand', self.brand)
+        log.add_backref('Holder', self.holder)
+        log.add_backref('Brand', self.brand)
         return log.formated_log()
 
 class Brand(db.Model, Logger):
@@ -131,7 +132,7 @@ class Brand(db.Model, Logger):
         log.add_field('Type', self.type)
         log.add_field('Threshold', self.threshold)
         log.add_field('Program', self.program)
-        log.add_relation('Manager', self.manager)
+        log.add_backref('Manager', self.manager.user)
         return log.formated_log()
 
 class Shop(db.Model, Logger):
