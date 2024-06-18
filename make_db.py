@@ -3,8 +3,10 @@ import configparser
 import randomname
 import names
 import random, string
+from lorem_text import lorem
 from flask_api import app, db
 from flask_api.models import User, Manager, Brand
+from flask_api.enums import BRAND_TYPE
 #from flask_test.random_generator import get_random_user, get_random_wallet
 
 '''
@@ -34,13 +36,13 @@ print(user)
 get_random_wallet()
 
 '''
-
 class DbGenerator():
     config = configparser.ConfigParser(interpolation=configparser.ExtendedInterpolation())
     brand_list = []
 
     def __init__(self):
-        self.config.read('config/models.ini')
+        # IMPORTANT - the order of the files matters as they overriwte common variables
+        self.config.read(['config/models.ini', 'config/generate_db.ini'])
 
         delete_command = "rm /root/tony/loyalty_backend/site.db"
         os.system(delete_command)
@@ -50,23 +52,34 @@ class DbGenerator():
 
 
     def generate_user(self):
-        return User(
+        user = User(
             nickname = names.get_full_name(),
             wallet_address = 'G' + ''.join([random.choice(string.ascii_uppercase  + string.digits) for _ in range(int(self.config["common"]["wallet_address_length"]))])
         )
+        db.session.add(user)
+        return user
 
     def generate_manager(self):
         manager = Manager(
             user = self.generate_user()
         )
-        #print(manager.u)
+        db.session.add(manager)
+        return manager
 
     def generate_brand(self):
+        brand = Brand(
+            name = ''.join([x.title() for x in randomname.get_name().split('-')]),
+            type = random.choice([x for x in BRAND_TYPE if x != BRAND_TYPE.Invalid]),
+            program = lorem.sentence(),
+            threshold = random.uniform(0, float(self.config["brand"]["threshold_max"])),
 
-        var = ''.join([x.title() for x in randomname.get_name().split('-')])
-        
-        print(var)
+            manager = self.generate_manager()
+        )
+        print(brand)
+        db.session.add(brand)
+        db.session.commit()
+
 
 db_generator = DbGenerator()
-print(db_generator.generate_user())
-#db_generator.generate_brand()
+for i in range(0,1000):
+    db_generator.generate_brand()

@@ -1,8 +1,37 @@
+import abc
 from sqlalchemy import Enum
 from flask_api import db, config
 from flask_api.enums import USER_TYPE, BRAND_TYPE, TRANSACTION_TYPE
 
-class User(db.Model):
+
+class Log():
+    def __init__(self, title, number_of_spaces):
+        self.number_of_spaces = number_of_spaces
+        self.special_character = " "
+        self.prefix = (number_of_spaces * 5)* self.special_character + '* '
+        self.return_string = self.prefix + '{ ' + title + ' }' + '\n'
+        self.return_string += self.prefix + '---------\n'
+
+    def formated_log(self):
+        return self.return_string
+
+    def add_field(self, field_name, value):
+        self.return_string += self.prefix + f'[{field_name}]: {value}\n'
+
+    def add_relation(self, field_name, relation_list):
+        self.return_string += self.prefix + f'[{field_name}]:\n'
+        print(type(relation_list))
+        #self.return_string += relation_list.log(self.number_of_spaces + 1)
+        for object in relation_list:
+            self.return_string += object.log(self.number_of_spaces + 1)
+
+class Logger():
+    def log(self, number_of_spaces = 0):
+        message = "[ERROR] Functie neimplementata"
+        print(message)
+        return message
+
+class User(db.Model, Logger):
     #[Keys and Foreign Keys]
     id = db.Column(db.Integer, primary_key=True)
 
@@ -16,17 +45,15 @@ class User(db.Model):
     cards = db.relationship('Card', backref='holder', lazy=True)
     transactions = db.relationship('Transaction', backref='sender', lazy=True)
 
-    def __repr__(self):
-        return (
-                    '{ User }\n'
-                    '---------\n'
-                    f'[ID]: {self.id}\n'
-                    #f'[User Type]: {self.type}\n'
-                    f'[Nickname]: {self.nickname}\n'
-                    f'[Wallet Address]: {self.wallet_address}\n'
-                )
+    def log(self, number_of_spaces=0):
+        log = Log("User" , number_of_spaces)
+        log.add_field('ID', self.id)
+        log.add_field('Nickname', self.nickname)
+        log.add_field('Wallet Address', self.wallet_address)
+        log.add_relation('Manager', self.manager)
+        return log.formated_log()
 
-class Cashier(db.Model):
+class Cashier(db.Model, Logger):
     #[Keys and Foreign Keys]
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -38,15 +65,13 @@ class Cashier(db.Model):
     #[Relationships]
     transactions = db.relationship('Transaction', backref='initiator', lazy=True)
 
-    def __repr__(self):
-        return (
-                    '{ Cashier }\n'
-                    '---------\n'
-                    f'[ID]: {self.id}\n'
-                    f'[Shop]: {self.shop}\n'
-                )
+    def log(self, number_of_spaces=0):
+        log = Log("Cashier" , number_of_spaces)
+        log.add_field('ID', self.id)
+        log.add_relation('Shop', self.shop)
+        return log.formated_log()
 
-class Manager(db.Model):
+class Manager(db.Model, Logger):
     #[Keys and Foreign Keys]
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -59,15 +84,12 @@ class Manager(db.Model):
     brand = db.relationship('Brand', backref='manager', lazy=True)
     #transactions = db.relationship('Transaction', backref='initiator', lazy=True)
 
-    def __repr__(self):
-        return (
-                    '{ Manager }\n'
-                    '---------\n'
-                    f'[ID]: {self.id}\n'
-                    f'[Brand Name]: {self.brand.name}\n'
-                )
+    def log(self, number_of_spaces=0):
+        log = Log("Manager" , number_of_spaces)
+        log.add_field('ID', self.id)
+        return log.formated_log()
 
-class Card(db.Model):
+class Card(db.Model, Logger):
     #[Keys and Foreign Keys]
     id = db.Column(db.Integer, primary_key=True)
     holder_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -79,17 +101,14 @@ class Card(db.Model):
     #[Relationships]
     transactions = db.relationship('Transaction', backref='card', lazy=True)
 
-    def __repr__(self):
-        return (
-                    '{ Card }\n'
-                    '---------\n'
-                    f'[ID]: {self.id}\n'
-                    f'[Holder]: {self.holder}\n'
-                    f'[Brand]: {self.brand}\n'
-                    f'[Wallet Address]: {self.wallet_address}\n'
-                )
+    def log(self, number_of_spaces=0):
+        log = Log("Card" , number_of_spaces)
+        log.add_field('ID', self.id)
+        log.add_relation('Holder', self.holder)
+        log.add_relation('Brand', self.brand)
+        return log.formated_log()
 
-class Brand(db.Model):
+class Brand(db.Model, Logger):
     #[Keys and Foreign Keys]
     id = db.Column(db.Integer, primary_key=True)
     manager_id = db.Column(db.Integer, db.ForeignKey('manager.id'), nullable=False)
@@ -105,18 +124,17 @@ class Brand(db.Model):
     shops = db.relationship('Shop', backref='brand', lazy=True)
     cards = db.relationship('Card', backref='brand', lazy=True)
 
-    def __repr__(self):
-        return (
-                    '{ Brand }\n'
-                    '---------\n'
-                    f'[ID]: {self.id}\n'
-                    f'[Name]: {self.name}\n'
-                    f'[Type]: {self.type}\n'
-                    f'[Threshold]: {self.threshold}\n'
-                    f'[Program]: {self.program}\n'
-                )
+    def log(self, number_of_spaces=0):
+        log = Log("Brand" , number_of_spaces)
+        log.add_field('ID', self.id)
+        log.add_field('Name', self.name)
+        log.add_field('Type', self.type)
+        log.add_field('Threshold', self.threshold)
+        log.add_field('Program', self.program)
+        log.add_relation('Manager', self.manager)
+        return log.formated_log()
 
-class Shop(db.Model):
+class Shop(db.Model, Logger):
     #[Keys and Foreign Keys]
     id = db.Column(db.Integer, primary_key=True)
     brand_id = db.Column(db.Integer, db.ForeignKey('brand.id'), nullable=False)
@@ -130,17 +148,15 @@ class Shop(db.Model):
     cashiers = db.relationship('Cashier', backref='shop', lazy=True)
     transactions = db.relationship('Transaction', backref='receiver', lazy=True)
 
-    def __repr__(self):
-        return (
-                    '{ Shop }\n'
-                    '---------\n'
-                    f'[ID]: {self.id}\n'
-                    f'[Location]: {self.location}\n'
-                    f'[Wallet_address]: {self.wallet_address}\n'
-                    f'[Brand]: {self.brand}\n'
-                )
+    def log(self, number_of_spaces=0):
+        log = Log("Shop" , number_of_spaces)
+        log.add_field('ID', self.id)
+        log.add_field('Location', self.location)
+        log.add_field('Wallet Address', self.wallet_address)
+        log.add_relation('Brand', self.brand)
+        return log.formated_log()
 
-class Transaction(db.Model):
+class Transaction(db.Model, Logger):
     #[Keys and Foreign Keys]
     id = db.Column(db.Integer, primary_key=True)
     sender_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
@@ -156,16 +172,14 @@ class Transaction(db.Model):
     #[Relationships]
     #N/A
 
-    def __repr__(self):
-        return (
-                    '{ Transaction }\n'
-                    '---------\n'
-                    f'[ID]: {self.id}\n'
-                    f'[Quantity]: {self.quantity}\n'
-                    f'[Date]: {self.date}\n'
-                    f'[Type]: {self.type}\n'
-                    f'    [Sender]: {self.sender}\n'
-                    f'    [Receiver]: {self.receiver}\n'
-                    f'    [Initiator]: {self.initiator}\n'
-                    f'    [Card]: {self.card}\n'
-                )
+    def log(self, number_of_spaces=0):
+        log = Log("Transaction" , number_of_spaces)
+        log.add_field('ID', self.id)
+        log.add_field('Quantity', self.quantity)
+        log.add_field('Date', self.date)
+        log.add_field('Type', self.type)
+        log.add_relation('Sender', self.sender)
+        log.add_relation('Receiver', self.receiver)
+        log.add_relation('Initiator', self.initiator)
+        log.add_relation('Card', self.card)
+        return log.formated_log()
