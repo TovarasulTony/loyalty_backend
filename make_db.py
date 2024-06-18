@@ -81,4 +81,5 @@ class DbGenerator():
 
 
 db_generator = DbGenerator()
-db_generator.generate_brand()
+for i in range(0,1000):
+    db_generator.generate_brand()

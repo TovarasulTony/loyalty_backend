@@ -3,8 +3,6 @@ from sqlalchemy import Enum
 from flask_api import db, config
 from flask_api.enums import USER_TYPE, BRAND_TYPE, TRANSACTION_TYPE
 
-def print_field(number_of_spaces, field_name, value=""):
-    return ' ' * number_of_spaces + f'[{field_name}]: {value}\n'
 
 class Log():
     def __init__(self, title, number_of_spaces):
@@ -22,6 +20,8 @@ class Log():
 
     def add_relation(self, field_name, relation_list):
         self.return_string += self.prefix + f'[{field_name}]:\n'
+        print(type(relation_list))
+        #self.return_string += relation_list.log(self.number_of_spaces + 1)
         for object in relation_list:
             self.return_string += object.log(self.number_of_spaces + 1)
 
