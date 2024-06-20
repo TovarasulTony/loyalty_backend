@@ -51,14 +51,17 @@ class User(db.Model, Logger):
         log.add_field('ID', self.id)
         log.add_field('Nickname', self.nickname)
         log.add_field('Wallet Address', self.wallet_address)
-        log.add_relation('Manager', self.manager)
+        if self.manager:
+            log.add_relation('Manager', self.manager)
+        if self.cashier:
+            log.add_relation('Cashier', self.cashier)
         return log.formated_log()
 
 class Cashier(db.Model, Logger):
     #[Keys and Foreign Keys]
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    shop_id = db.Column(db.Integer, db.ForeignKey('shop.id'), nullable=False)
+    shop_id = db.Column(db.Integer, db.ForeignKey('shop.id'))
 
     #[Fields]
     #N/A
@@ -69,7 +72,8 @@ class Cashier(db.Model, Logger):
     def log(self, number_of_spaces=0):
         log = Log("Cashier" , number_of_spaces)
         log.add_field('ID', self.id)
-        log.add_relation('Shop', self.shop)
+        if self.shop:
+            log.add_backref('Shop', self.shop)
         return log.formated_log()
 
 class Manager(db.Model, Logger):
@@ -154,7 +158,7 @@ class Shop(db.Model, Logger):
         log.add_field('ID', self.id)
         log.add_field('Location', self.location)
         log.add_field('Wallet Address', self.wallet_address)
-        log.add_relation('Brand', self.brand)
+        #log.add_backref('Brand', self.brand)
         return log.formated_log()
 
 class Transaction(db.Model, Logger):

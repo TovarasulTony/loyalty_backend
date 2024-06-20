@@ -5,7 +5,7 @@ import names
 import random, string
 from lorem_text import lorem
 from flask_api import app, db
-from flask_api.models import User, Manager, Brand, Card
+from flask_api.models import User, Manager, Brand, Card, Cashier, Shop
 from flask_api.enums import BRAND_TYPE
 #from flask_test.random_generator import get_random_user, get_random_wallet
 
@@ -66,6 +66,10 @@ class DbGenerator():
                 print(str(percentage) + '%')
             user = self.generate_user()
             db.session.add(user)
+
+        #print('Generating Cashiers...')
+
+        print('Commiting to DB...')
         db.session.commit()
 
         print('Generating Cards...')
@@ -101,6 +105,10 @@ class DbGenerator():
             user = self.generate_user()
         )
         db.session.add(manager)
+        cashier = Cashier(
+            user = manager.user
+        )
+        db.session.add(cashier)
         return manager
 
     def generate_brand(self):
@@ -113,8 +121,13 @@ class DbGenerator():
             manager = self.generate_manager()
         )
         db.session.add(brand)
+        no_of_shops = random.randint(int(self.config["brand"]["min_shops_per_brand"]), int(self.config["brand"]["max_shops_per_brand"]))
+        for i in range(0, no_of_shops):
+            shop = Shop(
+                location = ''.join([x.title() for x in randomname.get_name().split('-')])
+                wallet_address = 'G' + ''.join([random.choice(string.ascii_uppercase  + string.digits) for _ in range(int(self.config["common"]["wallet_address_length"]))])
+            )
         db.session.commit()
 
 
 db_generator = DbGenerator()
-

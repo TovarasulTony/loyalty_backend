@@ -15,3 +15,7 @@ query_response = all_cards
 
 for record in query_response:
     print(record.log())
+manager = User.query.filter(User.manager.__ne__(None)).first()
+manager.cashier[0].log()
+print(type(manager))
+manager.log()
